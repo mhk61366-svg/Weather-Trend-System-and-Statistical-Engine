@@ -33,3 +33,6 @@ weather_set.clean_data()
 print("Data Frame Dimensions after cleaning: ")
 # print shape of the attribute weather_data of Object weather set
 print(weather_set.weather_data.shape)
+
+weather_set.convert_data()
+print(weather_set.weather_data.head())  # check if date conversions went well
