@@ -19,11 +19,18 @@ class load_data_set:
 
     def convert_data(self):
         if self.weather_data is not None:
-            self.weather_data = self.weather_data.to_datetime(self.weather_data['dt'], format='%d/%m/%Y')
+            self.weather_data['dt'] = pd.to_datetime(self.weather_data['dt'], format='%d/%m/%Y')
         else:
             print("No DataFrame found")
     
         return self.weather_data
+
+class Statistical_Engine(load_data_set):
+    def __init__(self):
+        super().__init__()
+
+    def average_temp(self):
+
 
 weather_set = load_data_set()
 weather_set.load_data()
