@@ -25,6 +25,14 @@ class load_data_set:
     
         return self.weather_data
 
+
+class Weather_Visualizer:
+    def __init__(self) -> None:
+        self.dataframe = 
+
+class Weather_Report:
+
+    
 weather_set = load_data_set()
 weather_set.load_data()
 print("Data Frame Dimensions before cleaning: ")
