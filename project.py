@@ -37,6 +37,15 @@ class Statistical_Engine(load_data_set):
         else:
             print("No DataFrame found")    
 
+    def avg_uncertainity(self):
+        if self.weather_data is not None:
+            avg_uncert = self.weather_data.groupby("Country")["AverageTempratureUncertainty"].mean()
+            #  average temprature of a country through a period of 2 years
+            return avg_uncert
+        else:
+            print("No DataFrame found")  
+
+
 weather_set = Statistical_Engine()
 weather_set.load_data()
 print("Data Frame Dimensions before cleaning: ")
