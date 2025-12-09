@@ -61,8 +61,35 @@ class Statistical_Engine(load_data_set):
         else:
             print("No DataFrame found")
 
+class Weather_Visualizer:
+    def __init__(self) -> None:
+        self.stats_obj = Statistical_Engine()
+
+class Weather_Report:
+    def __init__(self) -> None:
+        self.stats_DataFrame = Statistical_Engine()
+
+    def top_5_hottest(self):
+        if self.stats_DataFrame.weather_data is not None:
+            avg_temp = self.stats_DataFrame.average_temp()
+            hottest = avg_temp.sort_values(ascending=False).head(5)
+            return hottest
+        else:
+            print("No DataFrame found")
+            return None
+
+    def top_5_coldest(self):
+        if self.stats_DataFrame.weather_data is not None:
+            avg_temp = self.stats_DataFrame.average_temp()
+            coldest = avg_temp.sort_values(ascending=True).head(5)
+            return coldest
+        else:
+            print("No DataFrame found")
+            return None
+
+
+#-----------------------Testing section(proper Menu not made Yet)-----------------------
 weather_set = Statistical_Engine()
->>>>>>> e895c126a7ccb9332ce69931e720a0f27788c185
 weather_set.load_data()
 print("Data Frame Dimensions before cleaning: ")
 print(weather_set.weather_data.shape)
@@ -78,3 +105,19 @@ print(weather_set.average_temp())
 print(weather_set.avg_uncertainity())
 print(weather_set.sd_temp())
 print(weather_set.variance_temp())
+
+# Initialize report
+report = Weather_Report()
+
+# Load and prepare data
+report.stats_DataFrame.load_data()
+report.stats_DataFrame.clean_data()
+report.stats_DataFrame.convert_data()
+
+# Show top 5 hottest countries
+print("Top 5 Hottest Countries:")
+print(report.top_5_hottest())
+
+# Show top 5 coldest countries
+print("\nTop 5 Coldest Countries:")
+print(report.top_5_coldest())
