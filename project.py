@@ -19,7 +19,7 @@ class load_data_set:
 
     def convert_data(self):
         if self.weather_data is not None:
-            self.weather_data['dt'] = pd.to_datetime(self.weather_data['dt'], format='%d/%m/%Y')
+            self.weather_data['dt'] = pd.to_datetime(self.weather_data['dt'])
         else:
             print("No DataFrame found")
     
@@ -39,12 +39,27 @@ class Statistical_Engine(load_data_set):
 
     def avg_uncertainity(self):
         if self.weather_data is not None:
-            avg_uncert = self.weather_data.groupby("Country")["AverageTempratureUncertainty"].mean()
+            avg_uncert = self.weather_data.groupby("Country")["AverageTemperatureUncertainty"].mean()
             #  average temprature of a country through a period of 2 years
             return avg_uncert
         else:
             print("No DataFrame found")  
 
+    def sd_temp(self):
+        if self.weather_data is not None:
+            standard_deviation = self.weather_data.groupby("Country")["AverageTemperature"].std()
+            # standard deviation of mean-monthly recorded temprature throughout 2 years
+            return standard_deviation
+        else:
+            print("No DataFrame found")
+    
+    def variance_temp(self):
+        if self.weather_data is not None:
+            var_temp = self.weather_data.groupby("Country")["AverageTemperature"].var()
+            # variance of mean-monthly recorded temprature throughout 2 years
+            return var_temp
+        else:
+            print("No DataFrame found")
 
 weather_set = Statistical_Engine()
 weather_set.load_data()
@@ -59,3 +74,6 @@ weather_set.convert_data()
 print(weather_set.weather_data.head())  # check if date conversions went well
 
 print(weather_set.average_temp())
+print(weather_set.avg_uncertainity())
+print(weather_set.sd_temp())
+print(weather_set.variance_temp())
