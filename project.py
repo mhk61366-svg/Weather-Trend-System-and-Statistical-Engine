@@ -30,9 +30,14 @@ class Statistical_Engine(load_data_set):
         super().__init__()
 
     def average_temp(self):
+        if self.weather_data is not None:
+            avg_temp = self.weather_data.groupby("Country")["AverageTemperature"].mean()
+            # average temprature of a country through a period of 2 years
+            return avg_temp
+        else:
+            print("No DataFrame found")    
 
-
-weather_set = load_data_set()
+weather_set = Statistical_Engine()
 weather_set.load_data()
 print("Data Frame Dimensions before cleaning: ")
 print(weather_set.weather_data.shape)
@@ -43,3 +48,5 @@ print(weather_set.weather_data.shape)
 
 weather_set.convert_data()
 print(weather_set.weather_data.head())  # check if date conversions went well
+
+print(weather_set.average_temp())
