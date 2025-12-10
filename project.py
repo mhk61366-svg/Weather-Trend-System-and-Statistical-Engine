@@ -90,6 +90,21 @@ class Weather_Report:
             print("No DataFrame found")
             return None
 
+    def hottest_month_each_country(self):
+        if self.stats_DataFrame.weather_data is None:
+            print("No DataFrame found")
+            return None
+
+        df = self.stats_DataFrame.weather_data.copy()
+
+        # Monthly mean temperature for each country
+        monthly_avg = df.groupby(["Country", "YearMonth"])["AverageTemperature"].mean()
+
+        # Find hottest month for each country
+        hottest = monthly_avg.groupby("Country").idxmax()
+
+        return hottest
+
     
     
     
