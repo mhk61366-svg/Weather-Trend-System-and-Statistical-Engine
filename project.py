@@ -4,7 +4,7 @@ class load_data_set:
     def __init__(self):
         self.weather_data = None
 
-    def load_data(self, file_path="D:\BS AI\python semester project\GlobalLandTemperaturesByCity.csv"):
+    def load_data(self, file_path="C:\Users\hp\Dekstop\Weather-Trend-System-and-Statistical\GlobalLandTemperaturesByCity.csv":
         self.weather_data = pd.read_csv(file_path)
         return self.weather_data
 
@@ -17,13 +17,16 @@ class load_data_set:
 
         return self.weather_data
 
-    def convert_data(self):
+    def convert_date(self):
         if self.weather_data is not None:
             self.weather_data['dt'] = pd.to_datetime(self.weather_data['dt'])
+            self.weather_data["Month"] = self.weather_data["dt"].dt.month
+            self.weather_data["Year"] = self.weather_data["dt"].dt.year
+            self.weather_data["YearMonth"] = self.weather_data["dt"].dt.to_period("M")
         else:
             print("No DataFrame found")
-    
         return self.weather_data
+
 
 class Statistical_Engine(load_data_set):
     def __init__(self):
@@ -87,6 +90,12 @@ class Weather_Report:
             print("No DataFrame found")
             return None
 
+    
+    
+    
+    
+     
+
 
 #-----------------------Testing section(proper Menu not made Yet)-----------------------
 weather_set = Statistical_Engine()
@@ -98,7 +107,7 @@ print("Data Frame Dimensions after cleaning: ")
 # print shape of the attribute weather_data of Object weather set
 print(weather_set.weather_data.shape)
 
-weather_set.convert_data()
+weather_set.convert_date()
 print(weather_set.weather_data.head())  # check if date conversions went well
 
 print(weather_set.average_temp())
