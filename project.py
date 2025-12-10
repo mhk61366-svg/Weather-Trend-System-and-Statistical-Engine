@@ -119,8 +119,39 @@ class Weather_Report:
         coldest = monthly_avg.groupby("Country").idxmin()
 
         return coldest
-    
-    
+
+    def prediction_summary(self):
+        if self.stats_DataFrame.weather_data is None:
+            print("No DataFrame found")
+            return None
+
+        df = self.stats_DataFrame.weather_data.copy()
+        df = df.groupby(["Country", "YearMonth"])["AverageTemperature"].mean().reset_index()
+        df["YearMonth"] = df["YearMonth"].astype(str)
+        predictions = []
+
+        for country in df["Country"].unique():
+            cdf = df[df["Country"] == country].sort_values("YearMonth")
+            temps = cdf["AverageTemperature"].values
+            n = len(temps)
+            # Month indices 0..n-1
+            x = np.arange(n)
+            y = temps
+            # Linear regression
+            slope, intercept = np.polyfit(x, y, 1)
+            # Predict next 3 months
+            for i in range(1, 4):
+                pred_temp = slope * (n + i - 1) + intercept
+                # Generate month string
+                last_period = pd.Period(cdf["YearMonth"].iloc[-1], freq="M")
+                pred_period = last_period + i
+                predictions.append({
+                    "Country": country,
+                    "PredictedMonth": str(pred_period),
+                    "PredictedTemperature": round(pred_temp, 2)
+                })
+
+        return pd.DataFrame(predictions)
     
     
      
