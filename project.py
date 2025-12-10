@@ -105,6 +105,20 @@ class Weather_Report:
 
         return hottest
 
+    def coldest_month_each_country(self):
+        if self.stats_DataFrame.weather_data is None:
+            print("No DataFrame found")
+            return None
+
+        df = self.stats_DataFrame.weather_data.copy()
+
+        # Monthly mean temperature
+        monthly_avg = df.groupby(["Country", "YearMonth"])["AverageTemperature"].mean()
+
+        # Find coldest month for each country
+        coldest = monthly_avg.groupby("Country").idxmin()
+
+        return coldest
     
     
     
