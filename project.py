@@ -84,6 +84,14 @@ class Weather_Visualizer:
         plt.ylabel("average temprature")
         plt.show()
 
+    def sd_country(self):
+        sd_temperature = self.stats_obj.sd_temp()
+        bar_graph = plt.bar(sd_temperature.index,sd_temperature.values)
+        plt.xlabel("Country")
+        plt.ylabel("Standard Deviation")
+        plt.title("Standard Deviation vs Country Bar Graph")
+        plt.show()
+
 class Weather_Report:
     def __init__(self) -> None:
         self.stats_DataFrame = Statistical_Engine()
