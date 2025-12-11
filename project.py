@@ -65,6 +65,15 @@ class Weather_Visualizer:
     def __init__(self) -> None:
         self.stats_obj = Statistical_Engine()
 
+    def hottest_countries(self):
+        # Bar chart of top 5 hottest countries against avg temperature
+        avg_temperature = self.stats_obj.average_temp()
+        hottest = avg_temperature.sort_values(ascending=False).head(5)
+        bar_graph = plt.bar(hottest.index,hottest.values)
+        plt.xlabel("Country")
+        plt.ylabel("average temprature")
+        plt.title("Top 5 Hottest Countries")
+        
 class Weather_Report:
     def __init__(self) -> None:
         self.stats_DataFrame = Statistical_Engine()
