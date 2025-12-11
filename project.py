@@ -229,12 +229,18 @@ class Weather_Report:
     
 #----------------Menu-------------------#
 def main_menu():
+    # Create ONE dataset engine for the entire program
+    stats = Statistical_Engine()
+
+    stats.load_data()
+    stats.clean_data()
+    stats.convert_date()
+                           
+    visualizer = Weather_Visualizer()    # Share this same Dataset with visualizer & report system
+    visualizer.stats_obj = stats
+
     report = Weather_Report()
-    
-    # Load and prepare data
-    report.stats_DataFrame.load_data()
-    report.stats_DataFrame.clean_data()
-    report.stats_DataFrame.convert_date()
+    report.stats_DataFrame = stats
 
     while True:
         print("\n---------- WEATHER ANALYSIS MENU ----------")
@@ -242,25 +248,28 @@ def main_menu():
         print("2. Graphical Analysis")
         print("3. Weather Report")
         print("4. Exit")
-        try:
-            choice = input("Enter your choice (1-4): ")
 
-            if choice == "1":
-                statistical_analysis_menu(report)
-            elif choice == "2":
-                graphical_analysis_menu(report)
-            elif choice == "3":
-                weather_report_menu(report)
-            elif choice == "4":
-                print("Exiting program...")
-                break
-            else:
-                print("Invalid choice. Enter 1-4.")
-        except:
-            print("Wrong Input")
+        choice = input("Enter your choice (1-4): ")
+
+        if choice == "1":
+            statistical_analysis_menu(stats)
+
+        elif choice == "2":
+            graphical_analysis_menu(visualizer)
+
+        elif choice == "3":
+            weather_report_menu(report)
+
+        elif choice == "4":
+            print("Exiting program...")
+            break
+
+        else:
+            print("Invalid choice. Enter 1-4.")
+
 
 # Statistical Analysis Submenu
-def statistical_analysis_menu(report):
+def statistical_analysis_menu(stats):
     while True:
         print("\n--- STATISTICAL ANALYSIS ---")
         print("a. Average Temperature")
@@ -272,62 +281,44 @@ def statistical_analysis_menu(report):
         choice = input("Enter your choice (a-e): ").lower()
 
         if choice == "a":
-            print(report.stats_DataFrame.average_temp())
+            print(stats.average_temp())
         elif choice == "b":
-            print(report.stats_DataFrame.avg_uncertainity())
+            print(stats.avg_uncertainity())
         elif choice == "c":
-            print(report.stats_DataFrame.sd_temp())
+            print(stats.sd_temp())
         elif choice == "d":
-            print(report.stats_DataFrame.variance_temp())
+            print(stats.variance_temp())
         elif choice == "e":
             break
-        else:
-            print("Invalid choice. Enter a-e.")
 
 # Graphical Analysis Submenu
-def graphical_analysis_menu(report):
-    graphs = Weather_Visualizer()
-    graphs.stats_obj.load_data()
-    graphs.stats_obj.clean_data()
-    graphs.stats_obj.convert_date()
-
+def graphical_analysis_menu(visualizer):
     while True:
         print("\n--- GRAPHICAL ANALYSIS ---")
         print("a. Global Temperature Trend over Time")
         print("b. Average Temperature (Bar Graph)")
         print("c. Standard Deviation (Bar Graph)")
-        print("d. Hotspots Map using Latitude and Temperature")
+        print("d. Hotspots Map (Scatter Plot)")
         print("e. Back to Main Menu")
-        try:
-            choice = input("Enter your choice (a-e): ").lower()
 
-            if choice == "a":
-                # Line plot: average global temperature over months
-                graphs.avg_temp_graph()
+        choice = input("Enter your choice (a-e): ").lower()
 
-            elif choice == "b":
-                # top 5 hottest/coldest average
-                print("Average Temprature for Top 5 hottest countries Bar graph ")
-                graphs.hottest_countries()
-                print("Average Temprature for Top 5 coldest countries Bar graph ")
-                graphs.coldest_countries()
+        if choice == "a":
+            visualizer.avg_temp_graph()
 
-            elif choice == "c":
-                # Standard deviation bar graph
-                graphs.sd_country()
+        elif choice == "b":
+            visualizer.hottest_countries()
+            visualizer.coldest_countries()
 
-            elif choice == "d":
-                # Hotspots map
-                graphs.scatter_plot_graph()
-            elif choice == "e":
-                break
-            else:
-                print("Invalid choice. Enter a-e.")
-        except:
-            print("Invalid Input Error !!!")
+        elif choice == "c":
+            visualizer.sd_country()
+
+        elif choice == "d":
+            visualizer.scatter_plot_graph()
+
+        elif choice == "e":
+            break
             
-
-
 # Weather Report Submenu
 def weather_report_menu(report):
     while True:
@@ -350,8 +341,6 @@ def weather_report_menu(report):
             print(report.coldest_month_each_country())
         elif choice == "e":
             break
-        else:
-            print("Invalid choice. Enter a-e.")
 
 
 # Run the program
