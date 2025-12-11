@@ -92,6 +92,16 @@ class Weather_Visualizer:
         plt.title("Standard Deviation vs Country Bar Graph")
         plt.show()
 
+     def avg_temp_graph(self):
+        # user enters a country name and function shows the graph of avg-temp/time
+        x = input("Enter country name to view its graph")
+        selected_country = self.stats_obj.weather_data[self.stats_obj.weather_data["Country"] == x]
+        graph = plt.plot(selected_country["dt"],selected_country["AverageTemperature"])
+        plt.xlabel("Date")
+        plt.ylabel("Average Temperature")
+        plt.title(f"Temperature Trend of {x}")
+        plt.show()
+
 class Weather_Report:
     def __init__(self) -> None:
         self.stats_DataFrame = Statistical_Engine()
