@@ -70,59 +70,78 @@ class Weather_Visualizer:
         self.stats_obj = Statistical_Engine()
 
     def hottest_countries(self):
-        # Bar chart of top 5 hottest countries against avg temperature
-        avg_temperature = self.stats_obj.average_temp()
-        hottest = avg_temperature.sort_values(ascending=False).head(5)
-        bar_graph = plt.bar(hottest.index,hottest.values)
-        plt.xlabel("Country")
-        plt.ylabel("average temprature")
-        plt.title("Top 5 Hottest Countries")
+        if self.stats_obj is not None:
+            # Bar chart of top 5 hottest countries against avg temperature
+            avg_temperature = self.stats_obj.average_temp()
+            hottest = avg_temperature.sort_values(ascending=False).head(5)
+            bar_graph = plt.bar(hottest.index,hottest.values)
+            plt.xlabel("Country")
+            plt.ylabel("average temprature")
+            plt.title("Top 5 Hottest Countries")
+        else:
+            print("DataFrame not found !!!")
 
     def coldest_countries(self):
-        # Bar chart of top 5 coldest countries against avg temperature
-        avg_temperature = self.stats_obj.average_temp()
-        coldest = avg_temperature.sort_values(ascending=True).head(5)
-        bar_graph = plt.bar(coldest.index,coldest.values)
-        plt.title("Top 5 Coldest Countries")
-        plt.xlabel("Country")
-        plt.ylabel("average temprature")
-        plt.show()
+        if self.stats_obj is not None:
+            # Bar chart of top 5 coldest countries against avg temperature
+            avg_temperature = self.stats_obj.average_temp()
+            coldest = avg_temperature.sort_values(ascending=True).head(5)
+            bar_graph = plt.bar(coldest.index,coldest.values)
+            plt.title("Top 5 Coldest Countries")
+            plt.xlabel("Country")
+            plt.ylabel("average temprature")
+            plt.show()
+        else:
+            print("DataFrame not found !!!")
+
 
     def sd_country(self):
-        sd_temperature = self.stats_obj.sd_temp()
-        bar_graph = plt.bar(sd_temperature.index,sd_temperature.values)
-        plt.xlabel("Country")
-        plt.ylabel("Standard Deviation")
-        plt.title("Standard Deviation vs Country Bar Graph")
-        plt.show()
+        if self.stats_obj is not None:
+            sd_temperature = self.stats_obj.sd_temp()
+            bar_graph = plt.bar(sd_temperature.index,sd_temperature.values)
+            plt.xlabel("Country")
+            plt.ylabel("Standard Deviation")
+            plt.title("Standard Deviation vs Country Bar Graph")
+            plt.show()
+        else:
+            print("DataFrame not found !!!")
+
 
     def avg_temp_graph(self):
-        # user enters a country name and function shows the graph of avg-temp/time
-        x = input("Enter country name to view its graph")
-        selected_country = self.stats_obj.weather_data[self.stats_obj.weather_data["Country"] == x]
-        graph = plt.plot(selected_country["dt"],selected_country["AverageTemperature"])
-        plt.xlabel("Date")
-        plt.ylabel("Average Temperature")
-        plt.title(f"Temperature Trend of {x}")
-        plt.show()
+        if self.stats_obj is not None:
+            # user enters a country name and function shows the graph of avg-temp/time
+            x = input("Enter country name to view its graph")
+            selected_country = self.stats_obj.weather_data[self.stats_obj.weather_data["Country"] == x]
+            graph = plt.plot(selected_country["dt"],selected_country["AverageTemperature"])
+            plt.xlabel("Date")
+            plt.ylabel("Average Temperature")
+            plt.title(f"Temperature Trend of {x}")
+            plt.show()
+        else:
+            print("DataFrame not found !!!")
 
     def scatter_plot_graph(self):
-        # Take only one row per country (with lat/long)
-        unique_countries = self.stats_obj.weather_data.groupby("Country").first().reset_index()
-        avg_temp = self.stats_obj.average_temp().reset_index()
-        avg_temp.columns = ["Country", "AvgTemp"]
+        if self.stats_obj is not None:
+            # Take only one row per country (with lat/long)
+            unique_countries = self.stats_obj.weather_data.groupby("Country").first().reset_index()
+            avg_temp = self.stats_obj.average_temp().reset_index()
+            avg_temp.columns = ["Country", "AvgTemp"]
 
-        # Merge latitude/longitude + avg temperature into one dataframe
-        merged = pd.merge(unique_countries, avg_temp, on="Country", how="inner")
+            # Merge latitude/longitude + avg temperature into one dataframe
+            merged = pd.merge(unique_countries, avg_temp, on="Country", how="inner")
+            if merged is not None:
+                plt.figure(figsize=(10, 6))
 
-        plt.figure(figsize=(10, 6))
-        
-        plt.scatter(merged["Longitude"],merged["Latitude"],c = merged["AvgTemp"],cmap="coolwarm",alpha=0.7)
-        plt.colorbar(label = "Average Temperature")
-        plt.xlabel("Longitude")
-        plt.ylabel("Latitude")
-        plt.title("Scatter Plot of Latitude vs Longitude (Colored by Avg Temp)")
-        plt.show()
+                plt.scatter(merged["Longitude"],merged["Latitude"],c = merged["AvgTemp"],cmap="coolwarm",alpha=0.7)
+                plt.colorbar(label = "Average Temperature")
+                plt.xlabel("Longitude")
+                plt.ylabel("Latitude")
+                plt.title("Scatter Plot of Latitude vs Longitude (Colored by Avg Temp)")
+                plt.show()
+            else:
+                print("Could not plot graph")
+        else:
+            print("DataFrame not found !!!")
 
 class Weather_Report:
     def __init__(self) -> None:
