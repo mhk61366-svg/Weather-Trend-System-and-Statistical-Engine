@@ -5,7 +5,7 @@ class load_data_set:
     def __init__(self):
         self.weather_data = None
 
-    def load_data(self, file_path="C:\Users\hp\Dekstop\Weather-Trend-System-and-Statistical\GlobalLandTemperaturesByCity.csv":
+    def load_data(self, file_path="D:\BS AI\python semester project\GlobalLandTemperaturesByCity.csv"):
         self.weather_data = pd.read_csv(file_path)
         return self.weather_data
 
@@ -96,7 +96,7 @@ class Weather_Visualizer:
         plt.title("Standard Deviation vs Country Bar Graph")
         plt.show()
 
-     def avg_temp_graph(self):
+    def avg_temp_graph(self):
         # user enters a country name and function shows the graph of avg-temp/time
         x = input("Enter country name to view its graph")
         selected_country = self.stats_obj.weather_data[self.stats_obj.weather_data["Country"] == x]
@@ -104,6 +104,24 @@ class Weather_Visualizer:
         plt.xlabel("Date")
         plt.ylabel("Average Temperature")
         plt.title(f"Temperature Trend of {x}")
+        plt.show()
+
+    def scatter_plot_graph(self):
+        # Take only one row per country (with lat/long)
+        unique_countries = self.stats_obj.weather_data.groupby("Country").first().reset_index()
+        avg_temp = self.stats_obj.average_temp().reset_index()
+        avg_temp.columns = ["Country", "AvgTemp"]
+
+        # Merge latitude/longitude + avg temperature into one dataframe
+        merged = pd.merge(unique_countries, avg_temp, on="Country", how="inner")
+
+        plt.figure(figsize=(10, 6))
+        
+        plt.scatter(merged["Longitude"],merged["Latitude"],c = merged["AvgTemp"],cmap="coolwarm",alpha=0.7)
+        plt.colorbar(label = "Average Temperature")
+        plt.xlabel("Longitude")
+        plt.ylabel("Latitude")
+        plt.title("Scatter Plot of Latitude vs Longitude (Colored by Avg Temp)")
         plt.show()
 
 class Weather_Report:
@@ -343,4 +361,11 @@ def weather_report_menu(report):
 
 # Run the program
 if __name__ == "__main__":
-    main_menu()
+    # main_menu()
+    viz = Weather_Visualizer()
+    viz.stats_obj.load_data()       # Load dataset
+    viz.stats_obj.clean_data()      # Clean dataset
+    viz.stats_obj.convert_date()    # Convert date columns
+
+    # Call scatter plot function
+    viz.scatter_plot_graph()
