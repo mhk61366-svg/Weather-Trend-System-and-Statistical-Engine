@@ -73,7 +73,17 @@ class Weather_Visualizer:
         plt.xlabel("Country")
         plt.ylabel("average temprature")
         plt.title("Top 5 Hottest Countries")
-        
+
+    def coldest_countries(self):
+        # Bar chart of top 5 coldest countries against avg temperature
+        avg_temperature = self.stats_obj.average_temp()
+        coldest = avg_temperature.sort_values(ascending=True).head(5)
+        bar_graph = plt.bar(coldest.index,coldest.values)
+        plt.title("Top 5 Coldest Countries")
+        plt.xlabel("Country")
+        plt.ylabel("average temprature")
+        plt.show()
+
 class Weather_Report:
     def __init__(self) -> None:
         self.stats_DataFrame = Statistical_Engine()
