@@ -1,5 +1,5 @@
 import pandas as pd
-
+import matplotlib.pyplot as plt
 class load_data_set:
     def __init__(self):
         self.weather_data = None
@@ -65,6 +65,7 @@ class Weather_Visualizer:
     def __init__(self) -> None:
         self.stats_obj = Statistical_Engine()
 
+    
 class Weather_Report:
     def __init__(self) -> None:
         self.stats_DataFrame = Statistical_Engine()
@@ -89,35 +90,29 @@ class Weather_Report:
 
 
 #-----------------------Testing section(proper Menu not made Yet)-----------------------
-weather_set = Statistical_Engine()
-weather_set.load_data()
+weather_set = Weather_Visualizer()
+
+# Load data
+weather_set.stats_obj.load_data()
 print("Data Frame Dimensions before cleaning: ")
-print(weather_set.weather_data.shape)
-weather_set.clean_data()
+print(weather_set.stats_obj.weather_data.shape)
+
+# Clean data
+weather_set.stats_obj.clean_data()
 print("Data Frame Dimensions after cleaning: ")
-# print shape of the attribute weather_data of Object weather set
-print(weather_set.weather_data.shape)
+print(weather_set.stats_obj.weather_data.shape)
 
-weather_set.convert_data()
-print(weather_set.weather_data.head())  # check if date conversions went well
+# Convert date column
+weather_set.stats_obj.convert_data()
+print(weather_set.stats_obj.weather_data.head()) 
 
-print(weather_set.average_temp())
-print(weather_set.avg_uncertainity())
-print(weather_set.sd_temp())
-print(weather_set.variance_temp())
+# Statistical functions
+print(weather_set.stats_obj.average_temp().head())
+print(weather_set.stats_obj.avg_uncertainity().head())
+print(weather_set.stats_obj.sd_temp().head())
+print(weather_set.stats_obj.variance_temp().head())
 
-# Initialize report
-report = Weather_Report()
+# Graph
+# weather_set.avg_temp_graph()
 
-# Load and prepare data
-report.stats_DataFrame.load_data()
-report.stats_DataFrame.clean_data()
-report.stats_DataFrame.convert_data()
-
-# Show top 5 hottest countries
-print("Top 5 Hottest Countries:")
-print(report.top_5_hottest())
-
-# Show top 5 coldest countries
-print("\nTop 5 Coldest Countries:")
-print(report.top_5_coldest())
+weather_set.sd_country()
