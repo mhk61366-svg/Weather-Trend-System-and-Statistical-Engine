@@ -327,7 +327,8 @@ def weather_report_menu(report):
         print("b. Top 5 Coldest country")
         print("c. Hottest month in each country")
         print("d. Coldest month in each country")
-        print("e. Back to Main Menu")
+        print("e. Weather Prediction")
+        print("f. Back to Main Menu")
 
         choice = input("Enter your choice (a-e): ").lower()
 
@@ -339,7 +340,9 @@ def weather_report_menu(report):
             print(report.hottest_month_each_country())
         elif choice == "d":
             print(report.coldest_month_each_country())
-        elif choice == "e":
+        elif choice == 'e':
+            print(report.prediction_summary())
+        elif choice == "f":
             break
 
 
