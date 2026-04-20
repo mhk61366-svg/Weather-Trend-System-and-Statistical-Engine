@@ -2,31 +2,35 @@ name: Build EXE
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-latest   # ← MUST be windows-latest for .exe
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'   # use the same version you develop with
 
       - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install pyinstaller
           pip install -r requirements.txt
 
-      - name: Build EXE
-        run: pyinstaller --onefile --hidden-import matplotlib --collect-all matplotlib app.py
+      - name: Build EXE with PyInstaller
+        run: |
+          pyinstaller --onefile --windowed --name "MyApp" main.py
+          # Replace "main.py" with your actual entry point file
 
-      - name: Upload EXE
-        uses: actions/upload-artifact@v3
+      - name: Upload EXE as artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: weather-app
-          path: dist/app.exe
+          name: MyApp-Windows
+          path: dist/MyApp.exe
