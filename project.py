@@ -282,73 +282,120 @@ class Weather_Report:
         return pd.DataFrame(predictions)
     
     
-#----------------Menu-------------------#
-def main_menu():
-    # Create ONE dataset engine for the entire program
+# Statistical Analysis Submenu
+def GUI_statistical_menu():
     stats = Statistical_Engine()
-
     stats.load_data()
     stats.clean_data()
     stats.convert_date()
-                           
-    visualizer = Weather_Visualizer()    # Share this same Dataset with visualizer & report system
-    visualizer.stats_obj = stats
 
-    report = Weather_Report()
-    report.stats_DataFrame = stats
+    stat_GUI = tk.Tk()
+    stat_GUI.geometry("1280x960")
+    stat_GUI.resizable(False, False)
+    stat_GUI.title("Statistical Analysis")
 
-    while True:
-        print("\n---------- WEATHER ANALYSIS MENU ----------")
-        print("1. Statistical Analysis")
-        print("2. Graphical Analysis")
-        print("3. Weather Report")
-        print("4. Exit")
+    # Layout: left panel for buttons, right panel for output 
+    left_frame = tk.Frame(stat_GUI, width=320, bg="#2b2b2b")
+    left_frame.pack(side=tk.LEFT, fill=tk.Y)
+    left_frame.pack_propagate(False)
 
-        choice = input("Enter your choice (1-4): ")
+    right_frame = tk.Frame(stat_GUI, bg="#1e1e1e")
+    right_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        if choice == "1":
-            statistical_analysis_menu(stats)
+    # Title in left panel 
+    tk.Label(
+        left_frame, text="Statistical\nAnalysis",
+        bg="#2b2b2b", fg="white",
+        font=("Arial", 18, "bold"), pady=20
+    ).pack(fill=tk.X)
 
-        elif choice == "2":
-            graphical_analysis_menu(visualizer)
+    tk.Frame(left_frame, bg="#555", height=1).pack(fill=tk.X, padx=10)
 
-        elif choice == "3":
-            weather_report_menu(report)
+    # Output title + scrollable text on right 
+    output_title = tk.Label(
+        right_frame, text="Select a statistic from the menu",
+        bg="#1e1e1e", fg="#aaaaaa",
+        font=("Arial", 13, "italic"), anchor="w", padx=15, pady=10
+    )
+    output_title.pack(fill=tk.X)
 
-        elif choice == "4":
-            print("Exiting program...")
-            break
+    text_frame = tk.Frame(right_frame, bg="#1e1e1e")
+    text_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
-        else:
-            print("Invalid choice. Enter 1-4.")
+    scrollbar = tk.Scrollbar(text_frame)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
+    output_box = tk.Text(
+        text_frame,
+        font=("Courier New", 12),
+        bg="#1e1e1e", fg="#d4d4d4",
+        relief=tk.FLAT, state=tk.DISABLED,
+        yscrollcommand=scrollbar.set,
+        padx=10, pady=10
+    )
+    output_box.pack(fill=tk.BOTH, expand=True)
+    scrollbar.config(command=output_box.yview)
 
-# Statistical Analysis Submenu
-def statistical_analysis_menu(stats):
-    while True:
-        print("\n--- STATISTICAL ANALYSIS ---")
-        print("a. Average Temperature")
-        print("b. Average Uncertainty")
-        print("c. Standard Deviation")
-        print("d. Variance Temperature")
-        print("e. Back to Main Menu")
+    # Helper: write to output box 
+    def show_output(title, content_str):
+        output_title.config(text=title)
+        output_box.config(state=tk.NORMAL)
+        output_box.delete("1.0", tk.END)
+        output_box.insert(tk.END, content_str)
+        output_box.config(state=tk.DISABLED)
 
-        choice = input("Enter your choice (a-e): ").lower()
+    # ── Format a Series into an aligned two-column table ──
+    def format_series(series, col2_header):
+        lines = [f"  {'Country':<30} {col2_header}", "  " + "-" * 50]
+        for country, val in series.items():
+            lines.append(f"  {str(country):<30} {val:.4f}")
+        return "\n".join(lines)
 
-        if choice == "a":
-            print(stats.average_temp())
-        elif choice == "b":
-            print(stats.avg_uncertainity())
-        elif choice == "c":
-            print(stats.sd_temp())
-        elif choice == "d":
-            print(stats.variance_temp())
-        elif choice == "e":
-            break
+    # ── Callbacks ──
+    def show_avg_temp():
+        data = stats.average_temp()
+        if data is not None:
+            show_output("🌡️  Average Temperature by Country",
+                        format_series(data, "Avg Temp (°C)"))
 
-# Graphical Analysis Submenu
+    def show_avg_uncertainty():
+        data = stats.avg_uncertainity()
+        if data is not None:
+            show_output("📊  Average Temperature Uncertainty by Country",
+                        format_series(data, "Avg Uncertainty (°C)"))
 
-# Weather Report Submenu
+    def show_sd():
+        data = stats.sd_temp()
+        if data is not None:
+            show_output("📉  Standard Deviation of Temperature by Country",
+                        format_series(data, "Std Deviation (°C)"))
+
+    def show_variance():
+        data = stats.variance_temp()
+        if data is not None:
+            show_output("📈  Temperature Variance by Country",
+                        format_series(data, "Variance (°C²)"))
+
+    # ── Buttons ──
+    buttons = [
+        ("Average Temperature",       show_avg_temp),
+        ("verage Uncertainty",        show_avg_uncertainty),
+        ("Standard Deviation",         show_sd),
+        ("Variance",                   show_variance),
+    ]
+
+    btn_cfg = dict(
+        fg="white", bg="#3c3f41",
+        font=("Arial", 13), anchor="w",
+        padx=15, pady=12,
+        relief=tk.FLAT, cursor="hand2",
+        activebackground="#4e5254", activeforeground="white"
+    )
+
+    for label, cmd in buttons:
+        tk.Button(left_frame, text=label, command=cmd, **btn_cfg).pack(fill=tk.X, padx=10, pady=4)
+
+    stat_GUI.mainloop()
 
 
 def GUI_graphical_menu():
@@ -372,35 +419,50 @@ def GUI_graphical_menu():
     for i in range(6):
         graphs_menu.grid_columnconfigure(i, pad=10)
 
-    fig = Figure(figsize=(10,6), dpi=100)
+    fig = Figure(figsize=(10,6), dpi=100, facecolor="#2b2b2b")
     ax = fig.add_subplot(111)
+    ax.set_facecolor("#3c3f41")
+    fig.subplots_adjust(left=0.08, right=0.97, top=0.93, bottom=0.12) 
 
     canvas = FigureCanvasTkAgg(fig, master=graphs_menu)
     canvas.get_tk_widget().grid(row=4, column=0, columnspan=6, rowspan=2)
 
+    def style_ax():
+        ax.tick_params(colors="#cccccc")
+        ax.xaxis.label.set_color("#cccccc")
+        ax.yaxis.label.set_color("#cccccc")
+        ax.title.set_color("#ffffff")
+        for spine in ax.spines.values():
+            spine.set_edgecolor("#555555")
+
     # Get avg temprature Graph 
     def show_graph():
         visualizer.avg_temp_graph(ax, error_message, country)
+        style_ax()
         canvas.draw()
 
     # Get Scatter plot graph
     def show_scatter_graph():
         visualizer.scatter_plot_graph(ax, error_message)
+        style_ax()
         canvas.draw()
        
     # Get Hottest countries Bar graph
     def show_hottest_bargraph():
         visualizer.hottest_countries(ax, error_message)
+        style_ax()
         canvas.draw()
 
     # Get Coldest countries Bar graph
     def show_coldest_bargraph():
         visualizer.coldest_countries(ax, error_message)
+        style_ax()
         canvas.draw()
 
     # Get Standard Deviation Bar graph
     def show_sd_bargraph():
         visualizer.sd_country(ax, error_message)
+        style_ax()
         canvas.draw()
 
     error_message = tk.Label(graphs_menu, text="",fg= 'red', font=("Times new Roman",12))
@@ -409,16 +471,16 @@ def GUI_graphical_menu():
     prompt_country.grid(row=0,column=0)
     country = tk.Entry(graphs_menu, fg="black",bg="lightblue", font=("Times new Roman",12))
     country.grid(row=1,column=0)
-    get_graph = tk.Button(graphs_menu,text="Get Graph", font=("Times new Roman",12), command=show_graph, , fg="white", bg="#3c3f41")
-    get_graph.grid(padx=10, pady=5, row=0, column=1)
-    btn_scatter = tk.Button(graphs_menu, text="Scatter Plot",font=("Times new Roman",12), command=show_scatter_graph, , fg="white", bg="#3c3f41")
-    btn_scatter.grid(row=0 , column=2, padx=10, pady=5)
-    btn_hottest_bargraph = tk.Button(graphs_menu, text="Bar graph (hottest countries)", font=("Times new Roman",12), command=show_hottest_bargraph, , fg="white", bg="#3c3f41")
-    btn_hottest_bargraph.grid(row=0, column=3, padx=10, pady=5)
-    btn_coldest_bargraph = tk.Button(graphs_menu, text="Bar graph (Coldest countries)", font=("Times new Roman",12), command=show_coldest_bargraph, , fg="white", bg="#3c3f41")
-    btn_coldest_bargraph.grid(row=0, column=4, padx=10, pady=5)
-    btn_sd_graph = tk.Button(graphs_menu, text=" Standard deviation Bar graph", font=("Times new Roman",12), command=show_sd_bargraph, , fg="white", bg="#3c3f41")
-    btn_sd_graph.grid(row=0, column=5,padx=10, pady=5)
+    get_graph = tk.Button(graphs_menu,text="Get Graph", font=("Times new Roman",12), command=show_graph, fg="white", bg="#3c3f41", padx=15, pady=10)
+    get_graph.grid(padx=30, pady=10, row=0, column=1)
+    btn_scatter = tk.Button(graphs_menu, text="Scatter Plot",font=("Times new Roman",12), command=show_scatter_graph, fg="white", bg="#3c3f41", padx=15, pady=10)
+    btn_scatter.grid(row=0 , column=2, padx=30, pady=10)
+    btn_hottest_bargraph = tk.Button(graphs_menu, text="Bar graph (hottest countries)", font=("Times new Roman",12), command=show_hottest_bargraph, fg="white", bg="#3c3f41", padx=15, pady=10)
+    btn_hottest_bargraph.grid(row=0, column=3, padx=30, pady=10)
+    btn_coldest_bargraph = tk.Button(graphs_menu, text="Bar graph (Coldest countries)", font=("Times new Roman",12), command=show_coldest_bargraph, fg="white", bg="#3c3f41", padx=15, pady=10)
+    btn_coldest_bargraph.grid(row=0, column=4, padx=30, pady=10)
+    btn_sd_graph = tk.Button(graphs_menu, text=" Standard deviation Bar graph", font=("Times new Roman",12), command=show_sd_bargraph, fg="white", bg="#3c3f41", padx=15, pady=10)
+    btn_sd_graph.grid(row=0, column=5,padx=30, pady=10)
 
     graphs_menu.mainloop()
 
@@ -548,5 +610,29 @@ def GUI_report_menu():
 
     Report_GUI.mainloop()
 
-GUI_graphical_menu()
-# GUI_report_menu()
+# ------------------ Main Menu ------------------
+
+def MainMenu():
+    mainmenu = tk.Tk()
+    mainmenu.geometry("300x400")
+    mainmenu.resizable(False, False)
+    mainmenu.title("Weather Analysis App")
+    mainmenu.config(bg="#2b2b2b")
+
+    prompt = tk.Label(mainmenu, text="Weather Ananlysis APP", fg="White", bg="#3c3f41", font=("Arial", 18))
+    prompt.pack(pady=30)
+
+    btn1 = tk.Button(mainmenu, text="Statistics", fg="white", bg="#3c3f41", font=("Arial", 13), anchor="w", padx=15, pady=12, relief=tk.FLAT, cursor="hand2", activebackground="#4e5254", activeforeground="white", command=GUI_statistical_menu)
+    btn1.pack(fill=tk.X, padx=15, pady=5)
+
+    btn2 = tk.Button(mainmenu, text="Graphs", fg="white", bg="#3c3f41", font=("Arial", 13), anchor="w", padx=15, pady=12, relief=tk.FLAT, cursor="hand2", activebackground="#4e5254", activeforeground="white", command=GUI_graphical_menu)
+    btn2.pack(fill=tk.X, padx=15, pady=5)
+
+    btn3 = tk.Button(mainmenu, text="Weather Report", fg="white", bg="#3c3f41", font=("Arial", 13), anchor="w", padx=15, pady=12, relief=tk.FLAT, cursor="hand2", activebackground="#4e5254", activeforeground="white", command=GUI_report_menu)
+    btn3.pack(fill=tk.X, padx=15, pady=5)
+
+    btn4 = tk.Button(mainmenu, text="Exit", fg="white", bg="#3c3f41", font=("Arial", 13), anchor="w", padx=15, pady=12, relief=tk.FLAT, cursor="hand2", activebackground="#4e5254", activeforeground="white", command=mainmenu.destroy)
+    btn4.pack(fill=tk.X, padx=15, pady=5)
+    mainmenu.mainloop()
+
+MainMenu()
